@@ -34,5 +34,31 @@ namespace WebApiMongodb.Controllers
 
             return Ok(infectados);
         }
+
+        [HttpPut]
+        public ActionResult AtualizarInfectado([FromBody] InfectadoDto dto) 
+        {
+            var filter = Builders<Infectado>.Filter.Eq(infectado => infectado.DataNascimento, dto.DataNascimento);
+
+            var oldInfectado = _infectadosCollection.Find(filter).First();
+            var oldId = oldInfectado.DataNascimento;
+
+            Infectado newInfectado = new Infectado(dto.DataNascimento, dto.Sexo, dto.Latitude, dto.Longitude);
+
+            var replaceResult = _infectadosCollection.ReplaceOne(filter, newInfectado);
+
+            return StatusCode(200, "Infectado atualizado com sucesso");
+        }
+
+
+        [HttpDelete]
+        public ActionResult ExcluirInfectado(DateTime dataNascimento)
+        {
+            var filter = Builders<Infectado>.Filter.Eq(infectado => infectado.DataNascimento, dataNascimento);
+
+           var deleteResult = _infectadosCollection.DeleteOne(filter);
+
+            return StatusCode(200, "Infectado excluído com sucesso");
+        }
     }
 }
